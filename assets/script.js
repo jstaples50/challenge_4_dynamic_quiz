@@ -1,9 +1,10 @@
 // Global variables
 
+var questionDivEl = document.querySelector("#question");
 var questionEl = document.querySelector("#question-tag");
 var answerDivEl = document.querySelector("#answers");
 var answerListEl = document.querySelector("#answer-list");
-
+var buttonEl = document.createElement("button");
 
 var question1 = {
     prompt: "Question 1 is asked here",
@@ -24,6 +25,13 @@ var question3 = {
 }; 
 
 questionArray = [question1, question2, question3];
+
+function init() {
+    questionEl.textContent = "Press the Button to start the Quiz!";
+    // var buttonEl = document.createElement("button");
+    buttonEl.textContent = "Press";
+    questionDivEl.appendChild(buttonEl);
+}
 
 // Question is rendered to DOM
 
@@ -57,4 +65,8 @@ function renderQuestion(question) {
 }
 
 
-renderQuestion(questionArray[1]);
+init();
+buttonEl.addEventListener('click', function(){
+    document.querySelector("button").remove();
+    renderQuestion(questionArray[1]);
+})
