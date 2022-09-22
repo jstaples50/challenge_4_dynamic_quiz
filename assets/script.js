@@ -4,7 +4,14 @@ var questionDivEl = document.querySelector("#question");
 var questionEl = document.querySelector("#question-tag");
 var answerDivEl = document.querySelector("#answers");
 var answerListEl = document.querySelector("#answer-list");
+
+
 var buttonEl = document.createElement("button");
+buttonEl.setAttribute("class", "start-button");
+buttonEl.textContent = "Press";
+var nextEl = document.createElement("button");
+nextEl.setAttribute("class", "next-button");
+nextEl.textContent = "Next";
 
 var question1 = {
     prompt: "Question 1 is asked here",
@@ -28,14 +35,24 @@ questionArray = [question1, question2, question3];
 
 function init() {
     questionEl.textContent = "Press the Button to start the Quiz!";
-    // var buttonEl = document.createElement("button");
-    buttonEl.textContent = "Press";
     questionDivEl.appendChild(buttonEl);
 }
 
 // Question is rendered to DOM
 
 function renderQuestion(question) {
+    
+    var hr = document.createElement("hr");
+    var trueResponse = document.createElement("p");
+
+    // Deletes selected question from questionArray
+
+    for (let i = 0; i < questionArray.length; i++) {
+        if (question === questionArray[i]) {
+            questionArray.splice(i, 1);
+        }
+    }
+
     questionEl.textContent = question.prompt;
     for (i = 0; i < question.answerArray.length; i++) {
         var liEl = document.createElement("li");
@@ -49,24 +66,30 @@ function renderQuestion(question) {
     //  *TODO* : trueResponse textContent keeps adding on after element is pushed
 
     function checkIfCorrect(event) {
-        let hr = document.createElement("hr");
-        let trueResponse = document.createElement("p");
         trueResponse.style.fontStyle = "italic";
         answerDivEl.appendChild(hr);
         answerDivEl.appendChild(trueResponse);
         if (event.target.textContent === question.correctAnswer) {
             trueResponse.textContent = "That is correct!"
+            questionDivEl.appendChild(nextEl);
         } else { 
             trueResponse.textContent = "Sorry, that is wrong..."
+            questionDivEl.appendChild(nextEl);
         }
     }
 
     answerListEl.addEventListener('click', checkIfCorrect);
+    nextEl.addEventListener('click', function() {
+        nextEl.remove();
+        hr.remove();
+        trueResponse.remove();
+        return;
+    })
 }
 
 
 init();
 buttonEl.addEventListener('click', function(){
-    document.querySelector("button").remove();
-    renderQuestion(questionArray[1]);
+    document.querySelector(".start-button").remove();
+    renderQuestion(questionArray[Math.floor(Math.random() * questionArray.length)]);
 })
