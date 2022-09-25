@@ -11,12 +11,16 @@ var exitBtnEl = document.createElement("button");
 exitBtnEl.setAttribute("class", "exit-button");
 exitBtnEl.textContent = "EXIT";
 
-var buttonEl = document.createElement("button");
-buttonEl.setAttribute("class", "start-button");
-buttonEl.textContent = "Press";
+var startButtonEl = document.createElement("button");
+startButtonEl.setAttribute("class", "start-button");
+startButtonEl.textContent = "Press";
 var nextEl = document.createElement("button");
 nextEl.setAttribute("class", "next-button");
 nextEl.textContent = "Next";
+
+var hr = document.createElement("hr");
+var trueResponse = document.createElement("p");
+trueResponse.style.fontStyle = "italic";
 
 var question1 = {
     prompt: "Question 1 is asked here",
@@ -43,12 +47,18 @@ var question3 = {
 questionArray = [question1, question2, question3];
 
 
+// Functions
+
 function beginGame() {
     questionEl.textContent = "Press the Button to start the Quiz!";
-    questionDivEl.appendChild(buttonEl);
+    questionDivEl.appendChild(startButtonEl);
+    startButtonEl.addEventListener('click', function(){
+        document.querySelector(".start-button").remove();
+        renderQuestion(questionArray[Math.floor(Math.random() * questionArray.length)]);
+    })
+
     answerDivEl.appendChild(exitBtnEl);
     exitBtnEl.addEventListener('click', exitGame);
-
 }
 
 function exitGame(event) {
@@ -59,11 +69,6 @@ function exitGame(event) {
 
 function renderQuestion(question) {
     
-    var hr = document.createElement("hr");
-    var trueResponse = document.createElement("p");
-    trueResponse.style.fontStyle = "italic";
-
-
     // Deletes selected question from questionArray
 
     for (let i = 0; i < questionArray.length; i++) {
@@ -101,41 +106,42 @@ function renderQuestion(question) {
     }
 
 
-    // Deletes List Items
-
-    function removeListItems() {
-        allListItems = document.querySelectorAll('li');
-        allListItemsArray = Array.from(allListItems);
-        allListItemsArray.forEach(element => {
-            element.remove();            
-        });
-    }
-
     if (question.questionHasBeenAnswered === false) {
         answerListEl.addEventListener('click', checkIfCorrect);
     } else if (question.questionHasBeenAnswered === true) {
         answerListEl.removeEventListener('click', checkIfCorrect);
     }
 
-// Functionality for the Next button
-
-
-    nextEl.addEventListener('click', function() {
-        nextEl.remove();
-        hr.remove();
-        trueResponse.remove();
-        console.log(removeListItems());
-    })
 }
 
-function removeAnswerEventListener() {
+// Deletes List Items
 
+function removeListItems() {
+    allListItems = document.querySelectorAll("li");
+    allListItemsArray = Array.from(allListItems);
+    allListItemsArray.forEach(element => {
+        element.remove();            
+     });
+}
+
+// Functionality for the Next button
+
+function nextButton() {
+    nextEl.remove();
+    hr.remove();
+    trueResponse.remove();
+    console.log(removeListItems());
+    if (questionArray.length > 0) {
+        renderQuestion(questionArray[Math.floor(Math.random() * questionArray.length)]);    
+    } else {
+        questionDivEl.textContent = "High Score Page";
+        answerDivEl.remove()
+    }
+    console.log(questionArray);
 }
 
 
 beginGame();
-buttonEl.addEventListener('click', function(){
-    document.querySelector(".start-button").remove();
-    renderQuestion(questionArray[Math.floor(Math.random() * questionArray.length)]);
-    
-})
+nextEl.addEventListener('click', nextButton);
+
+
