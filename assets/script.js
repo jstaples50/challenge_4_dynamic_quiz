@@ -7,6 +7,11 @@ var questionEl = document.querySelector("#question-tag");
 var answerDivEl = document.querySelector("#answers");
 var answerListEl = document.querySelector("#answer-list");
 
+var currentScore = 0
+var currentScoreEl = document.createElement("p");
+questionDivEl.appendChild(currentScoreEl);
+currentScoreEl.textContent = currentScore;
+
 var exitBtnEl = document.createElement("button");
 exitBtnEl.setAttribute("class", "exit-button");
 exitBtnEl.textContent = "EXIT";
@@ -21,6 +26,7 @@ nextEl.textContent = "Next";
 var hr = document.createElement("hr");
 var trueResponse = document.createElement("p");
 trueResponse.style.fontStyle = "italic";
+
 
 var question1 = {
     prompt: "Question 1 is asked here",
@@ -90,12 +96,18 @@ function renderQuestion(question) {
     // TODO: Duplicate code in checkIfCorrect, check if it can be refractered
 
 
+    function faddingAnswer() {
+        var fadeInverval = setInterval(checkIfCorrect, 2000);
+    }
+
     function checkIfCorrect(event) {
          if (event.target.textContent === question.correctAnswer) {
             answerDivEl.appendChild(hr);
             answerDivEl.appendChild(trueResponse);
             trueResponse.textContent = "That is correct!"
             answerDivEl.appendChild(nextEl);
+            currentScore++;
+            currentScoreEl.textContent = currentScore;
         } else { 
             answerDivEl.appendChild(hr);
             answerDivEl.appendChild(trueResponse);
@@ -103,8 +115,11 @@ function renderQuestion(question) {
             answerDivEl.appendChild(nextEl);
         }
         question.questionHasBeenAnswered = true;
+        clearInterval(fadeInverval);
+        
     }
 
+    answerDivEl.addEventListener('click', faddingAnswer);
 
     if (question.questionHasBeenAnswered === false) {
         answerListEl.addEventListener('click', checkIfCorrect);
@@ -130,7 +145,7 @@ function nextButton() {
     nextEl.remove();
     hr.remove();
     trueResponse.remove();
-    console.log(removeListItems());
+    removeListItems();
     if (questionArray.length > 0) {
         renderQuestion(questionArray[Math.floor(Math.random() * questionArray.length)]);    
     } else {
@@ -139,6 +154,8 @@ function nextButton() {
     }
     console.log(questionArray);
 }
+
+
 
 
 beginGame();
