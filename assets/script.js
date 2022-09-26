@@ -1,32 +1,36 @@
-// Global variables
+// *GLOBAL VARIABLES*   
 
-var masterBool = false;
+var masterBool = true;
+
+// Containers
 
 var questionDivEl = document.querySelector("#question");
 var questionEl = document.querySelector("#question-tag");
 var answerDivEl = document.querySelector("#answers");
 var answerListEl = document.querySelector("#answer-list");
 
-var currentScore = 0
-var currentScoreEl = document.createElement("p");
-questionDivEl.appendChild(currentScoreEl);
-currentScoreEl.textContent = currentScore;
-
-var exitBtnEl = document.createElement("button");
-exitBtnEl.setAttribute("class", "exit-button");
-exitBtnEl.textContent = "EXIT";
+// Start Button
 
 var startButtonEl = document.createElement("button");
 startButtonEl.setAttribute("class", "start-button");
 startButtonEl.textContent = "Press";
-var nextEl = document.createElement("button");
-nextEl.setAttribute("class", "next-button");
-nextEl.textContent = "Next";
+
+// Display if answer is correct or incorrect
 
 var hr = document.createElement("hr");
-var trueResponse = document.createElement("p");
-trueResponse.style.fontStyle = "italic";
+var displayCorrectOrIncorrect = document.createElement("p");
+displayCorrectOrIncorrect.style.fontStyle = "italic";
 
+// List elements
+
+var liEl1 = document.createElement("li");
+var liEl2 = document.createElement("li");
+var liEl3 = document.createElement("li");
+var liEl4 = document.createElement("li");
+
+var listElementArray = [liEl1, liEl2, liEl3, liEl4];
+
+// Question variables
 
 var question1 = {
     prompt: "Question 1 is asked here",
@@ -52,113 +56,95 @@ var question3 = {
 
 questionArray = [question1, question2, question3];
 
+var clickedAnswer = "";
 
-// Functions
+
+
+// *FUNCTIONS*
+
+// Begins game at starting screen
 
 function beginGame() {
     questionEl.textContent = "Press the Button to start the Quiz!";
     questionDivEl.appendChild(startButtonEl);
     startButtonEl.addEventListener('click', function(){
         document.querySelector(".start-button").remove();
-        renderQuestion(questionArray[Math.floor(Math.random() * questionArray.length)]);
+        displayQuestions(questionArray[Math.floor(Math.random() * questionArray.length)]);
     })
 
-    answerDivEl.appendChild(exitBtnEl);
-    exitBtnEl.addEventListener('click', exitGame);
 }
 
-function exitGame(event) {
-    masterBool = true;
-}
+// Renders questions
 
-// Question is rendered to DOM
-
-function renderQuestion(question) {
-    
-    // Deletes selected question from questionArray
-
-    for (let i = 0; i < questionArray.length; i++) {
-        if (question === questionArray[i]) {
-            questionArray.splice(i, 1);
-        }
-    }
-
+function displayQuestions(question) {
     questionEl.textContent = question.prompt;
-    for (i = 0; i < question.answerArray.length; i++) {
-        var liEl = document.createElement("li");
-        liEl.setAttribute("data-number", i + 1);
-        liEl.textContent = question.answerArray[i];
-        answerListEl.appendChild(liEl);
-    }
 
-    // Check if answer clicked is correct
-    // Click event listener added
-    // TODO: Duplicate code in checkIfCorrect, check if it can be refractered
-
-
-    function faddingAnswer() {
-        var fadeInverval = setInterval(checkIfCorrect, 2000);
-    }
-
-    function checkIfCorrect(event) {
-         if (event.target.textContent === question.correctAnswer) {
-            answerDivEl.appendChild(hr);
-            answerDivEl.appendChild(trueResponse);
-            trueResponse.textContent = "That is correct!"
-            answerDivEl.appendChild(nextEl);
-            currentScore++;
-            currentScoreEl.textContent = currentScore;
-        } else { 
-            answerDivEl.appendChild(hr);
-            answerDivEl.appendChild(trueResponse);
-            trueResponse.textContent = "Sorry, that is wrong..."
-            answerDivEl.appendChild(nextEl);
+    removeQuestionFromQuestionArray();
+    addQuestionListItems();
+    selectAnswer();
+    
+    function addQuestionListItems() {
+        for (var i = 0; i < listElementArray.length; i++) {
+            listElementArray[i].textContent = question.answerArray[i];
+            answerListEl.appendChild(listElementArray[i]);
         }
-        question.questionHasBeenAnswered = true;
-        clearInterval(fadeInverval);
+    }
+
+    // Removes questions from question Array
+
+    function removeQuestionFromQuestionArray() {
+        for (let i = 0; i < questionArray.length; i++) {
+            if (question === questionArray[i]) {
+                questionArray.splice(i, 1);
+            }
+        }
+    }
+
+    // Select answer
+    function selectAnswer() {
+        answerListEl.addEventListener("click", function(event) {
+            clickedAnswer = event.target.textContent;
+            checkIfCorrect();
+        })
+    }
+
+
+    // Check if question is true
+
+    function checkIfCorrect() {
+        answerDivEl.appendChild(hr);
+        answerDivEl.appendChild(displayCorrectOrIncorrect);
         
+        if (clickedAnswer === question.correctAnswer) {
+            displayCorrectOrIncorrect.textContent = "That was correct!";
+        } else {
+            displayCorrectOrIncorrect.textContent = "That was wrong.";
+        }
     }
-
-    answerDivEl.addEventListener('click', faddingAnswer);
-
-    if (question.questionHasBeenAnswered === false) {
-        answerListEl.addEventListener('click', checkIfCorrect);
-    } else if (question.questionHasBeenAnswered === true) {
-        answerListEl.removeEventListener('click', checkIfCorrect);
-    }
-
 }
 
-// Deletes List Items
+// Moves on to next screen
 
-function removeListItems() {
-    allListItems = document.querySelectorAll("li");
-    allListItemsArray = Array.from(allListItems);
-    allListItemsArray.forEach(element => {
-        element.remove();            
-     });
-}
-
-// Functionality for the Next button
-
-function nextButton() {
-    nextEl.remove();
-    hr.remove();
-    trueResponse.remove();
-    removeListItems();
+function next(event) {
     if (questionArray.length > 0) {
-        renderQuestion(questionArray[Math.floor(Math.random() * questionArray.length)]);    
+        displayQuestions(questionArray[Math.floor(Math.random() * questionArray.length)]);;
     } else {
-        questionDivEl.textContent = "High Score Page";
-        answerDivEl.remove()
+        endScreen();
     }
-    console.log(questionArray);
 }
 
+// Countdown timer to determine points
 
+function countdown() {}
 
+// Enter in highscore screen
+
+function endScreen() {
+    questionDivEl.textContent = "High Score Page";
+    document.getElementById("answer-list").remove();
+}
+
+// *EXECUTION*
 
 beginGame();
-nextEl.addEventListener('click', nextButton);
-
-
+answerDivEl.addEventListener('click', next);
