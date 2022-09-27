@@ -9,6 +9,7 @@ var answerDivEl = document.querySelector("#answers");
 
 var answerListEl = document.createElement("ul");
 answerListEl.setAttribute("id", "answer-list");
+answerListEl.setAttribute("class", "centered");
 
 var highScoreDisplayEl = document.querySelector("#highscore");
 var initialsDisplayEl = document.querySelector("#initials");
@@ -41,23 +42,23 @@ var listElementArray = [liEl1, liEl2, liEl3, liEl4];
 // Question variables
 
 var question1 = {
-    prompt: "Question 1 is asked here",
-    answerArray: ["A", "B", "C", "D"],
-    correctAnswer: "A",
+    prompt: "What does CSS stand for?",
+    answerArray: ["Casscading Style Sheets", "Cornered Slice Shelving", "C#", "JavaScript"],
+    correctAnswer: "Casscading Style Sheets",
     questionHasBeenAnswered: false
 }; 
 
 var question2 = {
-    prompt: "Question 2 is asked here",
-    answerArray: ["A", "B", "C", "D"],
-    correctAnswer: "B",
+    prompt: "Which is not a main language for Web Development?",
+    answerArray: ["JavaScript", "Python", "HTML", "CSS"],
+    correctAnswer: "Python",
     questionHasBeenAnswered: false
 }; 
 
 var question3 = {
-    prompt: "Question 3 is asked here",
-    answerArray: ["A", "B", "C", "D"],
-    correctAnswer: "C",
+    prompt: "What is the html element for the biggest heading?",
+    answerArray: ["<h6>", "<BigH>", "<h1>", "<~largest>"],
+    correctAnswer: "<h1>",
     questionHasBeenAnswered: false
 
 }; 
