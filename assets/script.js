@@ -13,10 +13,20 @@ answerListEl.setAttribute("class", "centered");
 
 var highScoreDisplayEl = document.querySelector("#highscore");
 var initialsDisplayEl = document.querySelector("#initials");
-highScoreObject = JSON.parse(localStorage.getItem("Current High Score"));
-highScoreDisplayEl.textContent = (`Current High Score: ${highScoreObject.score}`);
-initialsDisplayEl.textContent = (`Initials of Champ: ${highScoreObject.initials}`);
 
+var currentHighScore = {
+    initials: "",
+    score: ""
+};
+
+localStorage.setItem("Current High Score", JSON.stringify(currentHighScore));
+
+highScoreObject = JSON.parse(localStorage.getItem("Current High Score"));
+
+ if (highScoreObject !== null) {
+    highScoreDisplayEl.textContent = (`Current High Score: ${highScoreObject.score}`);
+    initialsDisplayEl.textContent = (`Initials of Champ: ${highScoreObject.initials}`);
+}
 
 // Start Button
 
@@ -220,16 +230,26 @@ function endScreen() {
     answerDivEl.removeEventListener("click", next);
 
     submitButtonEl.addEventListener("click", function() {
-        if (timeLeft > highScoreObject.score) {
+        if (typeof highScoreObject !== null) {
+            if (timeLeft > highScoreObject.score) {
+                currentHighScore = {
+                    initials: highScoreNameEl.value.trim(),
+                    score: timeLeft
+                };
+                localStorage.setItem("Current High Score", JSON.stringify(currentHighScore));
+                getHighScore();
+            } else {
+                alert("You don't have a high enough score to be the champ!");
+            }
+        } else {
             var currentHighScore = {
                 initials: highScoreNameEl.value.trim(),
                 score: timeLeft
             };
             localStorage.setItem("Current High Score", JSON.stringify(currentHighScore));
             getHighScore();
-        } else {
-            alert("You don't have a high enough score to be the champ!");
         }
+    
     })
 
     playAgainButtonEl.addEventListener("click", playAgain);
