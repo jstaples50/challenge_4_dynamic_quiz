@@ -1,13 +1,21 @@
 // *GLOBAL VARIABLES*   
 
-var masterBool = true;
 
 // Containers
 
 var questionDivEl = document.querySelector("#question");
 var questionEl = document.querySelector("#question-tag");
 var answerDivEl = document.querySelector("#answers");
-var answerListEl = document.querySelector("#answer-list");
+
+var answerListEl = document.createElement("ul");
+answerListEl.setAttribute("id", "answer-list");
+
+var highScoreDisplayEl = document.querySelector("#highscore");
+var initialsDisplayEl = document.querySelector("#initials");
+highScoreObject = JSON.parse(localStorage.getItem("Current High Score"));
+highScoreDisplayEl.textContent = (`Current High Score: ${highScoreObject.score}`);
+initialsDisplayEl.textContent = (`Initials of Champ: ${highScoreObject.initials}`);
+
 
 // Start Button
 
@@ -57,6 +65,57 @@ var question3 = {
 questionArray = [question1, question2, question3];
 
 var clickedAnswer = "";
+var currentCorrectAnswer = "";
+
+
+// Countdown variable
+
+var timeLeft = 15;
+var timeEl = document.createElement("p");
+timeEl.textContent = timeLeft;
+
+var gameOver = false;
+
+// High Score name input 
+
+ var highScoreNameEl = document.createElement("input");
+highScoreNameEl.setAttribute("type", "text");
+highScoreNameEl.setAttribute("id", "highscore-name");
+highScoreNameEl.setAttribute("name", "highscore-name")
+var highScoreLabelEl = document.createElement("label");
+highScoreLabelEl.setAttribute("for", "highscore-name");
+highScoreLabelEl.textContent = "Enter your initials here";
+
+// Submit Button
+
+var submitButtonEl = document.createElement("button");
+submitButtonEl.setAttribute("class", "start-button");
+submitButtonEl.textContent = "Submit";
+
+// Play Again Button
+
+var playAgainButtonEl = document.createElement("button");
+playAgainButtonEl.setAttribute("class", "start-button");
+playAgainButtonEl.textContent = "Play Again?";
+
+
+// Event Listeners
+
+startButtonEl.addEventListener('click', function(){
+    answerDivEl.appendChild(answerListEl);
+    document.querySelector(".start-button").remove();
+    questionDivEl.appendChild(timeEl);
+    countdown();
+    displayQuestions(questionArray[Math.floor(Math.random() * questionArray.length)]);
+})
+
+answerListEl.addEventListener("click", function(event) {
+    clickedAnswer = event.target.textContent;
+    console.log(clickedAnswer);
+    checkIfCorrect();
+})
+
+answerListEl.addEventListener("click", next);
 
 
 
@@ -67,21 +126,18 @@ var clickedAnswer = "";
 function beginGame() {
     questionEl.textContent = "Press the Button to start the Quiz!";
     questionDivEl.appendChild(startButtonEl);
-    startButtonEl.addEventListener('click', function(){
-        document.querySelector(".start-button").remove();
-        displayQuestions(questionArray[Math.floor(Math.random() * questionArray.length)]);
-    })
-
 }
 
 // Renders questions
 
 function displayQuestions(question) {
+    // debugger;
+    currentCorrectAnswer = question.correctAnswer;
     questionEl.textContent = question.prompt;
 
     removeQuestionFromQuestionArray();
     addQuestionListItems();
-    selectAnswer();
+    
     
     function addQuestionListItems() {
         for (var i = 0; i < listElementArray.length; i++) {
@@ -100,51 +156,109 @@ function displayQuestions(question) {
         }
     }
 
-    // Select answer
-    function selectAnswer() {
-        answerListEl.addEventListener("click", function(event) {
-            clickedAnswer = event.target.textContent;
-            checkIfCorrect();
-        })
-    }
-
 
     // Check if question is true
 
-    function checkIfCorrect() {
-        answerDivEl.appendChild(hr);
-        answerDivEl.appendChild(displayCorrectOrIncorrect);
-        
-        if (clickedAnswer === question.correctAnswer) {
-            displayCorrectOrIncorrect.textContent = "That was correct!";
-        } else {
-            displayCorrectOrIncorrect.textContent = "That was wrong.";
-        }
-    }
+   
 }
 
 // Moves on to next screen
 
 function next(event) {
-    if (questionArray.length > 0) {
+    if (questionArray.length > 0 && gameOver === false) {
         displayQuestions(questionArray[Math.floor(Math.random() * questionArray.length)]);;
     } else {
         endScreen();
     }
 }
 
+function checkIfCorrect() {
+    answerDivEl.appendChild(hr);
+    answerDivEl.appendChild(displayCorrectOrIncorrect);
+    
+    if (clickedAnswer === currentCorrectAnswer) {
+        displayCorrectOrIncorrect.textContent = "That was correct!";
+    } else {
+        displayCorrectOrIncorrect.textContent = "That was wrong.";
+        timeLeft -= 3;
+    }
+    currentCorrectAnswer = "";
+}
+
+
 // Countdown timer to determine points
 
-function countdown() {}
+function countdown() {
+    var timeInterval = setInterval(function() {
+        if (timeLeft > 0) {
+            timeLeft--;
+        }
+
+        timeEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(timeInterval);
+            endScreen();
+        } else if (gameOver === true) {
+            clearInterval(timeInterval);
+        }
+
+    }, 1000);
+}
 
 // Enter in highscore screen
 
 function endScreen() {
-    questionDivEl.textContent = "High Score Page";
+    gameOver = true;
+    questionEl.textContent = "Game Over";
+    answerDivEl.appendChild(highScoreLabelEl);
+    answerDivEl.appendChild(highScoreNameEl);
+    answerDivEl.appendChild(submitButtonEl);
+    answerDivEl.appendChild(playAgainButtonEl);
     document.getElementById("answer-list").remove();
+    answerDivEl.removeEventListener("click", next);
+
+    submitButtonEl.addEventListener("click", function() {
+        if (timeLeft > highScoreObject.score) {
+            var currentHighScore = {
+                initials: highScoreNameEl.value.trim(),
+                score: timeLeft
+            };
+            localStorage.setItem("Current High Score", JSON.stringify(currentHighScore));
+            getHighScore();
+        } else {
+            alert("You don't have a high enough score to be the champ!");
+        }
+    })
+
+    playAgainButtonEl.addEventListener("click", playAgain);
 }
+
+function playAgain() {
+    // Reset variables
+    // debugger;
+    answerDivEl.replaceChildren();
+    timeLeft = 15;
+    gameOver = false;
+    clickedAnswer = "";
+    questionArray = [question1, question2, question3];
+
+    // Call start of game
+
+    beginGame();
+}
+
+function getHighScore() {
+    highScoreObject = JSON.parse(localStorage.getItem("Current High Score"));
+    highScoreDisplayEl.textContent = (`Current High Score: ${highScoreObject.score}`);
+    initialsDisplayEl.textContent = (`Initials of Champ: ${highScoreObject.initials}`);
+}
+
+
 
 // *EXECUTION*
 
 beginGame();
-answerDivEl.addEventListener('click', next);
+
+
+
